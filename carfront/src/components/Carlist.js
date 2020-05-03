@@ -2,6 +2,10 @@ import React, { Component } from 'react';
 import {SERVER_URL} from '../constants.js'
 import ReactTable from "react-table";
 import 'react-table/react-table.css';
+import {ToastContainer,toast} from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import AddCar from './AddCar';
+import EditCar from './EditCar';
 
 class Carlist extends Component {
   constructor(props) {
@@ -10,10 +14,10 @@ class Carlist extends Component {
   }
 
   componentDidMount() {
-    this.fechCars();
+    this.fetchCars();
   }
 
-  fechCars = () =>{
+  fetchCars = () =>{
     fetch(SERVER_URL + 'api/cars')
     .then((response) => response.json()) 
     .then((responseData) => {
@@ -26,9 +30,55 @@ class Carlist extends Component {
   }
 
   onDelClick = (link) =>{
-    fetch(link,{method:'DELETE'})
-    .then(res => this.fechCars())
+    if(window.confirm('Are you sure you want to delete?')) {
+      fetch(link, {method:'DELETE'})
+      .then(res=> {
+        toast.success('Car deleted', {
+          position: toast.POSITION.BOTTOM_LEFT
+        });
+        this.fetchCars();
+      })
+      .catch(err => {
+        toast.error("Error when deleting",{
+          position: toast.POSITION.BOTTOM_LEFT
+        });
+        console.error(err)
+      })
+    }
+  }
+
+  addCar(car){
+    fetch(SERVER_URL + 'api/cars',
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(car)
+    })
+    .then(res => this.fetchCars())
     .catch(err => console.error(err))
+  }
+
+  updateCar(car, link) {
+    fetch(link,
+      {method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(car)
+      })
+      .then(res => {
+        toast.success("Changes saved", {
+          position: toast.POSITION.BOTTOM_LEFT
+        });
+        this.fetchCars();
+      })
+      .catch(err =>
+        toast.error("Error when saving",{
+          position: toast.POSITION.BOTTOM_LEFT
+        })
+      )
   }
   
   
@@ -38,21 +88,31 @@ class Carlist extends Component {
       accessor: 'brand'
     }, {
       Header: 'Model',
-      accessor: 'model',
+      accessor: 'model'
     }, {
       Header: 'Color',
-      accessor: 'color',
+      accessor: 'color'
     }, {
       Header: 'Year',
-      accessor: 'year',
+      accessor: 'year'
     }, {
-      Header: 'Price €',
-      accessor: 'price',
-    },{
-      id: 'delbutton',
+      Header: 'Fuel',
+      accessor: 'fuel'
+    }, {
+      Header: 'Price (€)',
+      accessor: 'price'
+    }, {
       sortable: false,
       filterable: false,
-      width:100,
+      width: 100,
+      accessor: '_links.self.href',
+      Cell: ({value, row}) => (<EditCar car={row} link={value} 
+        updateCar={this.updateCar} fetchCars={this.fetchCars} />),
+      width: 100
+    }, {
+      sortable: false,
+      filterable: false,
+      width: 100,
       accessor: '_links.self.href',
       Cell: ({value}) => (<button onClick={()=>{this.onDelClick(value)}}>Delete</button>)
     }]
@@ -60,8 +120,10 @@ class Carlist extends Component {
 
     return (
       <div className="App">
+        <AddCar addCar={this.addCar} fetchCars={this.fetchCars}></AddCar>
         <ReactTable data={this.state.cars} columns={columns} 
           filterable={true}/>
+          <ToastContainer autoClose={1500}></ToastContainer>
       </div>
     );
   }
