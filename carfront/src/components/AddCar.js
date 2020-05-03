@@ -4,6 +4,8 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
+import Button from '@material-ui/core/Button';
+import TextField from '@material-ui/core/TextField';
 
 const AddCar = (props) => {
     const [open, setOpen] = useState(false);
@@ -29,28 +31,24 @@ const AddCar = (props) => {
     }
     return (
         <div>
-            <button style={{margin: 10}} onClick={handleClickOpen}>New Car</button>
+            <Button variant="outlined" color="primary" style={{margin: 10}} onClick={handleClickOpen}>New Car</Button>
             <Dialog open={open} onClose={handleClose}>
                 <DialogTitle>New car</DialogTitle>
                 <DialogContent>
-                    <input type="text" placeholder="Brand" name="brand"
-                    value={car.brand} onChange={handleChange}></input><br></br>
-
-                    <input type="text" placeholder="Model" name="model"
-                    value={car.model} onChange={handleChange}></input><br></br>
-
-                    <input type="text" placeholder="Color" name="color"
-                    value={car.color} onChange={handleChange}></input><br></br>
-
-                    <input type="text" placeholder="Year" name="year"
-                    value={car.year} onChange={handleChange}></input><br></br>
-
-                    <input type="text" placeholder="Price" name="price"
-                    value={car.price} onChange={handleChange}></input><br></br>
-                </DialogContent>
+         <TextField autoFocus fullWidth label="Brand" name="brand" 
+              value={car.brand} onChange={handleChange}/> 
+         <TextField fullWidth label="Model" name="model" 
+              value={car.model} onChange={handleChange}/>
+         <TextField fullWidth label="Color" name="color" 
+              value={car.color} onChange={handleChange}/>
+         <TextField fullWidth label="Year" name="year" 
+              value={car.year} onChange={handleChange}/>
+         <TextField fullWidth label="Price" name="price" 
+              value={car.price} onChange={handleChange}/>
+       </DialogContent>
                 <DialogActions>
-                    <button onClick={handleClose}>Cancel</button>
-                    <button onClick={handleSave}>Save</button>
+                    <Button color="secondary" onClick={handleClose}>Cancel</Button>
+                    <Button color="primary" onClick={handleSave}>Save</Button>
                 </DialogActions>
                 </Dialog>
         </div>
